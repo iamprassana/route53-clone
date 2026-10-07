@@ -12,7 +12,7 @@ from backend.app.auth.service import (
 
 from backend.app.auth.auth_helper import get_current_user
 from backend.app.schema.schema import User
-from backend.core.security import COOKIE_SECURE
+from backend.core.security import COOKIE_SECURE, COOKIE_SAMESITE
 
 
 router = APIRouter(
@@ -51,6 +51,7 @@ def logoutUser(response: Response):
         key="access_token",
         httponly=True,
         secure=COOKIE_SECURE,
-        samesite="lax",
+        samesite=COOKIE_SAMESITE,
+        path="/",
     )
     return None

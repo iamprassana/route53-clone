@@ -7,6 +7,7 @@ from backend.app.schema.schema import User
 from backend.core.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     COOKIE_SECURE,
+    COOKIE_SAMESITE,
     create_access_token,
     hash_password,
     verify_password,
@@ -28,7 +29,8 @@ def userLoginService(data: UserLogin, db: Session, response: Response):
         value = access_token,
         httponly = True,
         secure = COOKIE_SECURE,
-        samesite = "lax",
+        samesite = COOKIE_SAMESITE,
+        path = "/",
         max_age = ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
     return {
@@ -58,18 +60,18 @@ def userRegisterService(data: UserCreate, db: Session):
         db.refresh(newUser)
         return UserResponse.model_validate(newUser)
     
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User with this email already exists",
+        )
+
     except SQLAlchemyError:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database operation failed",
-        )
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to register user: {str(e)}",
         )
 
 def getUserService(user: User):
