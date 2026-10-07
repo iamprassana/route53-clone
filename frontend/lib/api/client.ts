@@ -32,6 +32,9 @@ export function getApiErrorMessage(
         if (Array.isArray(detail) && detail[0]?.msg) {
             return detail[0].msg;
         }
+        if (!error.response) {
+            return "The authentication service is unavailable. Please try again.";
+        }
     }
     return fallback;
 }
