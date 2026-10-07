@@ -35,9 +35,10 @@ async def global_exception_handler(request: Request, exc: Exception):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
+        "http://localhost:3000",
+        "https://route53-clone-frontend-ten.vercel.app",
     ],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -14,7 +14,6 @@ import type {
 
 const api = axios.create({
     baseURL: "http://16.176.176.178:8000",
-    withCredentials: true,
     headers: {
         "Content-Type": "application/json",
     },
