@@ -29,3 +29,4 @@ class HostedZoneResponse(BaseModel):
     private_zone: bool
     tags: list[str]
     created_at: datetime
+    record_count: int

@@ -46,6 +46,10 @@ class HostedZone(Base):
         cascade="all, delete-orphan",
     )
 
+    @property
+    def record_count(self) -> int:
+        return len(self.records)
+
 
 class DNSRecord(Base):
     __tablename__ = "dns_records"

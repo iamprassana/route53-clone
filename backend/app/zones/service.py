@@ -64,7 +64,7 @@ def create_hosted_zone(data: HostedZoneCreate, current_user: User, db: Session):
         db.commit()
         db.refresh(zone)
 
-        return 
+        return zone
     
     except SQLAlchemyError:
         db.rollback()

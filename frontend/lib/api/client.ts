@@ -13,7 +13,7 @@ import type {
 } from "../schema/types";
 
 const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
+    baseURL: "http://16.176.176.178:8000",
     withCredentials: true,
     headers: {
         "Content-Type": "application/json",
