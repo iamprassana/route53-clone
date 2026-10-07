@@ -13,7 +13,7 @@ import type {
 } from "../schema/types";
 
 const api = axios.create({
-    baseURL: "http://16.176.176.178:8000",
+    baseURL: "https:api.karthickprassana.in",
     headers: {
         "Content-Type": "application/json",
     },
