@@ -29,7 +29,7 @@ class HostedZone(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
-    name = Column(String, nullable=False, index=True)
+    name = Column(String, nullable=False,unique=True)
     comment = Column(String, nullable=True, default="")
     zone_type = Column(String, nullable=False, default="public")
     private_zone = Column(Boolean, nullable=False, default=False)
@@ -52,7 +52,7 @@ class DNSRecord(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     zone_id = Column(Integer, ForeignKey("hosted_zones.id"), nullable=False, index=True)
-    name = Column(String, nullable=False, index=True)
+    name = Column(String, nullable=False)
     record_type = Column(String, nullable=False, index=True)
     ttl = Column(Integer, nullable=False, default=300)
     values = Column(JSON, nullable=False, default=list)

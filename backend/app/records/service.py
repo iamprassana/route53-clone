@@ -1,4 +1,5 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from backend.app.records.schemas import RecordCreate, RecordUpdate
@@ -15,8 +16,9 @@ def list_records(
     current_user: User,
     db: Session,
 ):
-    
+    # Validate that the zone exists and belongs to the current user.
     get_zone(zone_id, current_user.id, db)
+    
     query = db.query(DNSRecord).filter(DNSRecord.zone_id == zone_id)
 
     if search:
@@ -30,17 +32,37 @@ def list_records(
 
 def create_record(zone_id: int, data: RecordCreate, current_user: User, db: Session):
 
+    # Validate that the zone exists and belongs to the current user.
     get_zone(zone_id, current_user.id, db)
+
     record = DNSRecord(zone_id=zone_id, **data.model_dump())
-    db.add(record)
-    db.commit()
-    db.refresh(record)
-    return record
+
+    try:
+        db.add(record)
+        db.commit()
+        db.refresh(record)
+        return record
+    
+    except SQLAlchemyError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database operation failed",
+        )
+    
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create record: {str(e)}",
+        )
 
 
 def get_record(zone_id: int, record_id: int, current_user: User, db: Session):
 
+    # Validate that the zone exists and belongs to the current user.
     get_zone(zone_id, current_user.id, db)
+    
     record = db.query(DNSRecord).filter(
         DNSRecord.id == record_id,
         DNSRecord.zone_id == zone_id,
@@ -64,14 +86,43 @@ def update_record(
     
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(record, field, value)
-    db.commit()
-    db.refresh(record)
+
+    try:
+        db.commit()
+        db.refresh(record)
+        return record
     
-    return record
+    except SQLAlchemyError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database operation failed",
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update record: {str(e)}",
+        )
 
 
 def delete_record(zone_id: int, record_id: int, current_user: User, db: Session):
     
     record = get_record(zone_id, record_id, current_user, db)
-    db.delete(record)
-    db.commit()
+
+    try:
+        db.delete(record)
+        db.commit()
+
+    except SQLAlchemyError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database operation failed",
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete record: {str(e)}",
+        )

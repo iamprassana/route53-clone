@@ -10,7 +10,7 @@ from backend.app.auth.service import (
     getUserService,
 )
 
-from backend.app.auth.dependencies import get_current_user
+from backend.app.auth.auth_helper import get_current_user
 from backend.app.schema.schema import User
 from backend.core.security import COOKIE_SECURE
 

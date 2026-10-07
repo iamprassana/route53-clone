@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query, Response, status
 from sqlalchemy.orm import Session
 
-from backend.app.auth.dependencies import get_current_user
+from backend.app.auth.auth_helper import get_current_user
 from backend.app.database import get_db
 from backend.app.schema.schema import User
 from backend.app.zones.schemas import (
@@ -38,6 +38,7 @@ def create_hosted_zone_endpoint(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+
     return create_hosted_zone(data, current_user, db)
 
 
@@ -57,6 +58,7 @@ def update_hosted_zone_endpoint(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
+    
     return update_hosted_zone(zone_id, data, current_user, db)
 
 

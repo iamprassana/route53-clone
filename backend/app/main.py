@@ -1,7 +1,9 @@
+import logging
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from backend.app.auth.router import router as auth_router
 from backend.app.database import engine
@@ -12,10 +14,28 @@ from backend.app.zones.router import router as zones_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+logger = logging.getLogger(__name__)
+
+
+#Global exception handler to handle all the thrown expections
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(
+        "Unhandled exception while processing %s %s",
+        request.method,
+        request.url.path,
+        exc_info=exc,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        os.getenv("ROUTE53_FRONTEND_ORIGIN", "http://localhost:3000")
+        os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
     ],
     allow_credentials=True,
     allow_methods=["*"],

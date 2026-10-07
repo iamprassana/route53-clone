@@ -6,17 +6,16 @@ from passlib.context import CryptContext
 
 
 SECRET_KEY = os.getenv(
-    "ROUTE53_SECRET_KEY",
+    "SECRET_KEY",
     "development-only-secret-key-change-me",
 )
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-COOKIE_SECURE = os.getenv("ROUTE53_COOKIE_SECURE", "false").lower() == "true"
-
+ACCESS_TOKEN_EXPIRE_MINUTES = 60*24
+# COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+COOKIE_SECURE = False
 
 pwd_context = CryptContext(
-    # PBKDF2 is provided by passlib and does not depend on a separate
-    # bcrypt backend, so it works consistently in this project environment.
+
     schemes=["pbkdf2_sha256"],
     deprecated="auto"
 )
