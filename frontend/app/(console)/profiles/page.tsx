@@ -15,9 +15,22 @@ export default function ProfilesPage() {
   useEffect(() => {
     let active = true;
 
+    try {
+      const storedUser = window.sessionStorage.getItem("route53-user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser) as User);
+        setLoading(false);
+      }
+    } catch {
+      window.sessionStorage.removeItem("route53-user");
+    }
+
     getUserData()
       .then((currentUser) => {
-        if (active) setUser(currentUser);
+        if (active) {
+          setUser(currentUser);
+          window.sessionStorage.setItem("route53-user", JSON.stringify(currentUser));
+        }
       })
       .catch((reason) => {
         if (active) setError(getApiErrorMessage(reason, "Unable to load your profile."));

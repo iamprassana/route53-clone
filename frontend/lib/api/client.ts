@@ -14,6 +14,7 @@ import type {
 
 const api = axios.create({
     baseURL: "https://api.karthickprassana.in",
+    withCredentials: true,
     headers: {
         "Content-Type": "application/json",
     },
@@ -23,8 +24,14 @@ export function getApiErrorMessage(
     error: unknown,
     fallback: string,
 ): string {
-    if (axios.isAxiosError<{ detail?: string }>(error)) {
-        return error.response?.data?.detail || fallback;
+    if (axios.isAxiosError<{ detail?: string | { msg?: string }[] }>(error)) {
+        const detail = error.response?.data?.detail;
+        if (typeof detail === "string") {
+            return detail;
+        }
+        if (Array.isArray(detail) && detail[0]?.msg) {
+            return detail[0].msg;
+        }
     }
     return fallback;
 }
@@ -37,6 +44,12 @@ export async function loginUser(
         email,
         password,
     });
+    if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(
+            "route53-user",
+            JSON.stringify(response.data.user),
+        );
+    }
     return response.data;
 }
 
@@ -138,5 +151,11 @@ export async function getUserData(): Promise<User> {
 }
 
 export async function logoutUser(): Promise<void> {
-    await api.post("/auth/logout");
+    try {
+        await api.post("/auth/logout");
+    } finally {
+        if (typeof window !== "undefined") {
+            window.sessionStorage.removeItem("route53-user");
+        }
+    }
 }

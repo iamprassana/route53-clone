@@ -974,16 +974,15 @@ tbody tr:last-child td {
 .account-menu {
   position: absolute;
   z-index: 40;
-  top: 47px;
+  top: 48px;
   right: 9px;
-  width: min(350px, calc(100vw - 16px));
+  width: min(390px, calc(100vw - 20px));
   max-height: calc(100vh - 58px);
   overflow-y: auto;
   border: 1px solid #536171;
-  border-top: 4px solid #536171;
-  border-radius: 0 0 7px 7px;
+  border-radius: 14px;
   background: #1a2531;
-  box-shadow: 0 8px 22px rgb(0 0 0 / 42%);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 42%);
   color: #d1d8e1;
   transform-origin: top right;
   animation: account-menu-in 120ms ease-out;
@@ -998,18 +997,21 @@ tbody tr:last-child td {
 .account-plan,
 .account-menu-item,
 .visual-mode {
-  padding: 9px 14px;
+  padding: 12px 16px;
 }
 
 .account-menu-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-height: 46px;
   font-size: 17px;
 }
 
 .account-plan {
   border-bottom: 1px solid #3b4652;
+  padding-top: 8px;
+  padding-bottom: 12px;
 }
 
 .account-plan>strong {
@@ -1065,6 +1067,14 @@ tbody tr:last-child td {
   font-size: 15px;
 }
 
+.account-menu-error {
+  margin: 0;
+  padding: 8px 16px;
+  border-bottom: 1px solid #3b4652;
+  color: #ff9b9b;
+  font-size: 13px;
+}
+
 .account-menu-item:hover {
   background: #243344;
 }
@@ -1076,7 +1086,7 @@ tbody tr:last-child td {
 .visual-mode {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border-bottom: 1px solid #3b4652;
   font-size: 15px;
 }
@@ -2871,9 +2881,27 @@ tbody tr:last-child td {
   }
 
   .global-search,
-  .ask-q,
-  .account {
+  .ask-q {
     display: none;
+  }
+
+  .account {
+    display: flex;
+    max-width: 116px;
+    overflow: hidden;
+  }
+
+  .account strong,
+  .account small {
+    max-width: 116px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .account-menu {
+    top: 48px;
+    right: 8px;
   }
 
   .create-zone-page {
