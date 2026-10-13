@@ -771,6 +771,19 @@ tbody tr:last-child td {
   gap: 18px;
 }
 
+.auth-page .field input:not([type="radio"]),
+.auth-page .field textarea {
+  border-color: #d7dee8;
+  background: #ffffff;
+  color: #172033;
+}
+
+.auth-page .field input:focus,
+.auth-page .field textarea:focus {
+  border-color: #0969da;
+  box-shadow: 0 0 0 2px #e8f1ff;
+}
+
 .auth-submit {
   width: 100%;
   margin-top: 4px;
