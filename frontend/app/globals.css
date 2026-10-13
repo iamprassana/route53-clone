@@ -111,6 +111,11 @@ body {
   scrollbar-color: #7d8997 #18232f;
 }
 
+html[data-theme="light"],
+html[data-theme="light"] body {
+  scrollbar-color: #7d8997 #f5f7fa;
+}
+
 *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -128,6 +133,15 @@ body {
 
 *::-webkit-scrollbar-thumb:hover {
   background: #a3afbc;
+}
+
+:root[data-theme="light"] *::-webkit-scrollbar-track {
+  background: #f5f7fa;
+}
+
+:root[data-theme="light"] *::-webkit-scrollbar-thumb {
+  background: #7d8997;
+  border-color: #f5f7fa;
 }
 
 body {
@@ -2733,6 +2747,65 @@ tbody tr:last-child td {
   color: #172033;
 }
 
+.console-shell[data-theme="light"] {
+  background: #ffffff;
+  color: #172033;
+}
+
+.console-shell[data-theme="light"] .console-crumbbar {
+  border-bottom-color: #d7dee8;
+  background: #ffffff;
+  color: #5d687b;
+}
+
+.console-shell[data-theme="light"] .menu-button {
+  color: #5d687b;
+}
+
+.console-shell[data-theme="light"] .console-sidebar {
+  border-right-color: #d7dee8;
+  background: #ffffff;
+  color: #172033;
+}
+
+.console-shell[data-theme="light"] .sidebar-title {
+  border-bottom-color: #d7dee8;
+}
+
+.console-shell[data-theme="light"] .sidebar-title button {
+  color: #5d687b;
+}
+
+.console-shell[data-theme="light"] .sidebar-link {
+  color: #334155;
+}
+
+.console-shell[data-theme="light"] .sidebar-link:hover,
+.console-shell[data-theme="light"] .sidebar-link.active {
+  color: #0969da;
+}
+
+.console-shell[data-theme="light"] .sidebar-group-title {
+  color: #172033;
+}
+
+.console-shell[data-theme="light"] .sidebar-external {
+  color: #334155;
+}
+
+.console-shell[data-theme="light"] .console-sidebar::-webkit-scrollbar-track {
+  background: #f5f7fa;
+}
+
+.console-shell[data-theme="light"] .console-sidebar::-webkit-scrollbar-thumb {
+  background: #aeb9c6;
+  border-color: #f5f7fa;
+}
+
+.console-shell[data-theme="light"] .console-sidebar {
+  scrollbar-color: #aeb9c6 #f5f7fa;
+}
+
 .console-shell[data-theme="light"] .zones-page-heading p {
   color: #5d687b;
 }
@@ -2841,6 +2914,44 @@ tbody tr:last-child td {
 
 .mode-button.selected-mode {
   color: #42baff;
+}
+
+/* The AWS account menu keeps the console's dark appearance in both modes. */
+.account-menu {
+  border-color: #536171;
+  background: #1a2531;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 42%);
+  color: #d1d8e1;
+}
+
+.account-menu .account-plan {
+  border-bottom-color: #3b4652;
+}
+
+.account-menu .account-plan small {
+  color: #aeb8c5;
+}
+
+.account-menu .account-plan b {
+  color: #b8c1cd;
+}
+
+.account-menu .account-menu-item,
+.account-menu .account-menu-error,
+.account-menu .visual-mode {
+  border-color: #3b4652;
+}
+
+.account-menu .account-menu-item {
+  color: #d1d8e1;
+}
+
+.account-menu .account-menu-item:hover {
+  background: #243344;
+}
+
+.account-menu .account-menu-error {
+  color: #ff9b9b;
 }
 
 @media (max-width: 900px) {

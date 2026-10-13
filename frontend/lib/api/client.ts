@@ -12,7 +12,7 @@ import type {
     UpdateZoneInput,
 } from "../schema/types";
 
-export const api = axios.create({
+const api = axios.create({
     baseURL:
         "https://api.karthickprassana.in",
     withCredentials: true,
@@ -48,6 +48,12 @@ export async function loginUser(
         email,
         password,
     });
+    // if (typeof window !== "undefined") {
+    //     window.sessionStorage.setItem(
+    //         "route53-user",
+    //         JSON.stringify(response.data.user),
+    //     );
+    // }
     return response.data;
 }
 

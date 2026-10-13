@@ -1,21 +1,5 @@
 import ConsoleLayout from "../../components/ConsoleLayout";
-import { InvalidSessionError, requireAuthenticatedUser } from "@/lib/auth/server";
-import { redirect } from "next/navigation";
 
-export default async function ConsoleRouteLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  try {
-    await requireAuthenticatedUser();
-  } catch (error) {
-    if (error instanceof InvalidSessionError) {
-      redirect("/login");
-    }
-
-    throw error;
-  }
-
+export default function ConsoleRouteLayout({ children }: { children: React.ReactNode }) {
   return <ConsoleLayout>{children}</ConsoleLayout>;
 }
