@@ -1,9 +1,11 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, JSON, String
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
+
 
 class User(Base):
     __tablename__ = "users"
@@ -19,9 +21,13 @@ class User(Base):
     )
     hosted_zones = relationship(
         "HostedZone",
-        back_populates="user",
+        backref="user",
         cascade="all, delete-orphan",
     )
+
+    @property
+    def hosted_zone_count(self):
+        return len(self.hosted_zones)
 
 
 class HostedZone(Base):
@@ -39,10 +45,9 @@ class HostedZone(Base):
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
-    user = relationship("User", back_populates="hosted_zones")
     records = relationship(
         "DNSRecord",
-        back_populates="hosted_zone",
+        backref="hosted_zone",
         cascade="all, delete-orphan",
     )
 
@@ -63,4 +68,3 @@ class DNSRecord(Base):
     routing_policy = Column(String, nullable=False, default="simple")
     alias_target = Column(String, nullable=True)
     health_check_id = Column(String, nullable=True)
-    hosted_zone = relationship("HostedZone", back_populates="records")

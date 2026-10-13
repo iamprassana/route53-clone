@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import os
-
-from jose import jwt
+from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 
@@ -10,9 +9,9 @@ SECRET_KEY = os.getenv(
     "development-only-secret-key-change-me",
 )
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60*24
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "true").lower() == "true"
-COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "none")
+ACCESS_TOKEN_EXPIRE_HOURS = 60*24
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax")
 
 pwd_context = CryptContext(
 
@@ -39,13 +38,11 @@ def create_access_token(data: dict):
     to_encode = data.copy()
 
     expire = datetime.now(timezone.utc) + timedelta(
-        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+        hours=ACCESS_TOKEN_EXPIRE_HOURS
     )
 
     to_encode.update({
         "iat": datetime.now(timezone.utc),
-        "username": data.get("username"),
-        "id": data.get("id"),
         "exp": expire
     })
 
@@ -54,3 +51,24 @@ def create_access_token(data: dict):
         SECRET_KEY,
         algorithm=ALGORITHM
     )
+
+def verify_access_token(token: str):
+    if not token:
+        return None
+
+    try:
+        decoded_token = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+        )
+
+        sub = decoded_token.get("sub")
+
+        if not sub:
+            return None
+
+        return sub
+
+    except JWTError:
+        return None

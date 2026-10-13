@@ -1,16 +1,15 @@
 from fastapi import HTTPException, Response, status
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
-
-from backend.app.auth.schemas import UserCreate, UserLogin, UserResponse
-from backend.app.schema.schema import User
-from backend.core.security import (
-    ACCESS_TOKEN_EXPIRE_MINUTES,
+from app.auth.schemas import UserCreate, UserLogin, UserResponse
+from app.schema.schema import User
+from core.security import (
+    ACCESS_TOKEN_EXPIRE_HOURS,
     COOKIE_SECURE,
     COOKIE_SAMESITE,
     create_access_token,
     hash_password,
-    verify_password,
+    verify_password
 )
 
 
@@ -31,7 +30,7 @@ def userLoginService(data: UserLogin, db: Session, response: Response):
         secure = COOKIE_SECURE,
         samesite = COOKIE_SAMESITE,
         path = "/",
-        max_age = ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        max_age = ACCESS_TOKEN_EXPIRE_HOURS * 60 * 60,
     )
     return {
         "message": "Login successful",
@@ -73,6 +72,3 @@ def userRegisterService(data: UserCreate, db: Session):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database operation failed",
         )
-
-def getUserService(user: User):
-    return UserResponse.model_validate(user)

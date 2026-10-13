@@ -1,18 +1,16 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, Request
 from sqlalchemy.orm import Session
 
-from backend.app.auth.schemas import UserCreate, UserLogin, UserResponse
-from backend.app.database import get_db
+from app.auth.schemas import UserCreate, UserLogin, UserResponse
+from app.database import get_db
 
-from backend.app.auth.service import (
+from app.auth.service import (
     userLoginService,
     userRegisterService,
-    getUserService,
 )
 
-from backend.app.auth.auth_helper import get_current_user
-from backend.app.schema.schema import User
-from backend.core.security import COOKIE_SECURE, COOKIE_SAMESITE
+from app.auth.auth_helper import get_user_from_token
+from core.security import COOKIE_SECURE, COOKIE_SAMESITE
 
 
 router = APIRouter(
@@ -40,10 +38,11 @@ def registerUser(
 
 @router.get("/me", response_model=UserResponse, status_code=200)
 def getUser(
-    current_user: User = Depends(get_current_user),
+    request: Request,
+    db: Session = Depends(get_db),
 ):
-    return getUserService(current_user)
-
+    cookie = request.cookies.get("access_token")
+    return get_user_from_token(cookie, db)
 
 @router.post("/logout", status_code=204)
 def logoutUser(response: Response):
