@@ -365,6 +365,27 @@ export function ConsoleSidebar({
   );
 }
 
+function getBreadcrumbs(pathname: string) {
+  const segments = pathname.split("/").filter(Boolean);
+
+  if (segments.length === 0) {
+    return [{ label: "Dashboard", href: "/dashboard" }];
+  }
+
+  return segments.map((segment, index) => {
+    const href = `/${segments.slice(0, index + 1).join("/")}`;
+
+    const label = segment
+      .replaceAll("-", " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+
+    return {
+      label,
+      href,
+    };
+  });
+}
+
 function getPageName(pathname: string) {
   if (pathname === "/dashboard") {
     return "Dashboard";
@@ -410,9 +431,19 @@ export default function ConsoleLayout({
 
         <span className="crumb-link">Route 53</span>
 
-        <ChevronRight size={16} />
+        {getBreadcrumbs(pathname).map((breadcrumb, index, breadcrumbs) => (
+          <span className="breadcrumb-item" key={breadcrumb.href}>
+            <ChevronRight size={16} />
 
-        <span>{getPageName(pathname)}</span>
+            {index === breadcrumbs.length - 1 ? (
+              <span>{breadcrumb.label}</span>
+            ) : (
+              <Link href={breadcrumb.href}>
+                {breadcrumb.label}
+              </Link>
+            )}
+          </span>
+        ))}
 
         <Info size={17} className="crumb-info" />
       </div>

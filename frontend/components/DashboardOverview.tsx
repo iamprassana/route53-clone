@@ -139,7 +139,7 @@ function Notifications() {
 
 function MoreResources() {
   return (
-    <section className="console-panel resource-panel">
+    <section className="console-panel resource-panel hover:cursor-pointer">
       <h2>
         More resources <ExternalLink size={16} />
       </h2>
@@ -155,15 +155,15 @@ function ServiceHealth() {
   return (
     <section className="console-panel service-health">
       <h2>Service health</h2>
+      <span>
 
-      <p>
         To view the current status of Route 53, see the{" "}
-        <a>
+        <a className="inline-flex items-center gap-1 whitespace-nowrap">
           AWS Service Health Dashboard{" "}
-          <ExternalLink size={14} />
+          <ExternalLink size={16} />
         </a>
         .
-      </p>
+      </span>
     </section>
   );
 }
