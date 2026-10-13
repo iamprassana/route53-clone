@@ -10,8 +10,8 @@ SECRET_KEY = os.getenv(
 )
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_HOURS = 60*24
-COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
-COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax")
+COOKIE_SECURE = True
+COOKIE_SAMESITE = "none"
 
 pwd_context = CryptContext(
 
