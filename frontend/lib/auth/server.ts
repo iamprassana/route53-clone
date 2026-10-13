@@ -5,10 +5,7 @@ import { cookies } from "next/headers";
 
 import type { User } from "@/lib/schema/types";
 
-const backendUrl =
-  process.env.API_URL ??
-  process.env.NEXT_PUBLIC_API_URL ??
-  "http://localhost:8000";
+const backendUrl = "https://api.karthickprassana.in";
 
 const serverApi = axios.create({
   baseURL: backendUrl,
