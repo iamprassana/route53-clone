@@ -24,6 +24,7 @@ import {
   getApiErrorMessage,
   getUserData,
   logoutUser,
+  subscribeToAuthLogout,
 } from "@/lib/api/client";
 import { ReactNode, useEffect, useRef, useState } from "react";
 
@@ -78,37 +79,20 @@ const sidebarGroups = [
 export function ConsoleHeader({
   theme,
   onThemeChange,
+  user,
+  onSignOut,
 }: {
   theme: "dark" | "light";
   onThemeChange: (theme: "dark" | "light") => void;
+  user: User;
+  onSignOut: () => Promise<void>;
 }) {
   const [accountOpen, setAccountOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const [userLoaded, setUserLoaded] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [accountError, setAccountError] = useState("");
   const router = useRouter();
   const accountTriggerRef = useRef<HTMLButtonElement>(null);
   const accountMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    try {
-      const storedUser = window.sessionStorage.getItem("route53-user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser) as User);
-      }
-    } catch {
-      window.sessionStorage.removeItem("route53-user");
-    }
-
-    getUserData()
-      .then((currentUser) => {
-        setUser(currentUser);
-        window.sessionStorage.setItem("route53-user", JSON.stringify(currentUser));
-      })
-      .catch(() => undefined)
-      .finally(() => setUserLoaded(true));
-  }, []);
 
   useEffect(() => {
     if (!accountOpen) {
@@ -147,7 +131,7 @@ export function ConsoleHeader({
     setAccountError("");
 
     try {
-      await logoutUser();
+      await onSignOut();
       router.replace("/login");
     } catch (reason) {
       setAccountError(getApiErrorMessage(reason, "Unable to sign out."));
@@ -191,8 +175,8 @@ export function ConsoleHeader({
           aria-haspopup="menu"
           aria-label="Open account menu"
         >
-          <strong>{user ? user.username : userLoaded ? "Account" : "Loading..."}</strong>
-          <small>{user ? user.email : userLoaded ? "Unable to load account" : "Loading account..."}</small>
+          <strong>{user.username}</strong>
+          <small>{user.email}</small>
         </button>
 
         <ChevronDown size={14} />
@@ -200,7 +184,7 @@ export function ConsoleHeader({
       {accountOpen && (
         <div ref={accountMenuRef} className="account-menu" role="menu">
           <div className="account-menu-heading">
-            <strong>{user ? user.username : userLoaded ? "Account" : "Loading..."}</strong>
+            <strong>{user.username}</strong>
             <ExternalLink size={18} />
           </div>
           <div className="account-plan">
@@ -246,7 +230,7 @@ export function ConsoleHeader({
             onClick={() => void signOut()}
             disabled={signingOut}
           >
-            {signingOut ? "Signing out..." : `Sign out of ${user ? user.username : "account"}`}
+            {signingOut ? "Signing out..." : `Sign out of ${user.username}`}
             <LogOut size={19} />
           </button>
         </div>
@@ -410,14 +394,66 @@ export default function ConsoleLayout({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [user, setUser] = useState<User | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    let active = true;
+
+    getUserData()
+      .then((currentUser) => {
+        if (active) {
+          setUser(currentUser);
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setUser(null);
+          router.replace("/login");
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setAuthLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [router]);
+
+  useEffect(
+    () =>
+      subscribeToAuthLogout(() => {
+        setUser(null);
+        router.replace("/login");
+      }),
+    [router],
+  );
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
 
+  async function signOut() {
+    await logoutUser();
+    setUser(null);
+  }
+
+  if (authLoading || !user) {
+    return <div className="console-shell" aria-busy="true" />;
+  }
+
   return (
     <div className="console-shell" data-theme={theme}>
-      <ConsoleHeader theme={theme} onThemeChange={setTheme} />
+      <ConsoleHeader
+        theme={theme}
+        onThemeChange={setTheme}
+        user={user}
+        onSignOut={signOut}
+      />
 
       <div className="console-crumbbar">
         <button

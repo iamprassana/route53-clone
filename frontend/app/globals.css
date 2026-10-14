@@ -771,6 +771,10 @@ tbody tr:last-child td {
   gap: 18px;
 }
 
+.auth-page .field {
+  color: #000;
+}
+
 .auth-page .field input:not([type="radio"]),
 .auth-page .field textarea {
   border-color: #d7dee8;

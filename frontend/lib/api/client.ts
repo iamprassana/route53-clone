@@ -48,12 +48,6 @@ export async function loginUser(
         email,
         password,
     });
-    // if (typeof window !== "undefined") {
-    //     window.sessionStorage.setItem(
-    //         "route53-user",
-    //         JSON.stringify(response.data.user),
-    //     );
-    // }
     return response.data;
 }
 
@@ -155,11 +149,30 @@ export async function getUserData(): Promise<User> {
 }
 
 export async function logoutUser(): Promise<void> {
-    try {
-        await api.post("/auth/logout");
-    } finally {
-        if (typeof window !== "undefined") {
-            window.sessionStorage.removeItem("route53-user");
-        }
+    await api.post("/auth/logout");
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        const channel = new BroadcastChannel("route53-auth");
+        channel.postMessage({ type: "logout" });
+        channel.close();
     }
+}
+
+export function subscribeToAuthLogout(onLogout: () => void): () => void {
+    if (typeof window === "undefined" || !("BroadcastChannel" in window)) {
+        return () => undefined;
+    }
+
+    const channel = new BroadcastChannel("route53-auth");
+    const handleMessage = (event: MessageEvent<{ type?: string }>) => {
+        if (event.data?.type === "logout") {
+            onLogout();
+        }
+    };
+
+    channel.addEventListener("message", handleMessage);
+
+    return () => {
+        channel.removeEventListener("message", handleMessage);
+        channel.close();
+    };
 }

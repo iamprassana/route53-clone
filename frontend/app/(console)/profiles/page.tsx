@@ -2,7 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { getApiErrorMessage, getUserData, logoutUser } from "../../../lib/api/client";
+import {
+  getApiErrorMessage,
+  getUserData,
+  logoutUser,
+  subscribeToAuthLogout,
+} from "../../../lib/api/client";
 import type { User } from "../../../lib/schema/types";
 
 export default function ProfilesPage() {
@@ -15,21 +20,10 @@ export default function ProfilesPage() {
   useEffect(() => {
     let active = true;
 
-    try {
-      const storedUser = window.sessionStorage.getItem("route53-user");
-      if (storedUser) {
-        setUser(JSON.parse(storedUser) as User);
-        setLoading(false);
-      }
-    } catch {
-      window.sessionStorage.removeItem("route53-user");
-    }
-
     getUserData()
       .then((currentUser) => {
         if (active) {
           setUser(currentUser);
-          window.sessionStorage.setItem("route53-user", JSON.stringify(currentUser));
         }
       })
       .catch((reason) => {
@@ -44,12 +38,22 @@ export default function ProfilesPage() {
     };
   }, []);
 
+  useEffect(
+    () =>
+      subscribeToAuthLogout(() => {
+        setUser(null);
+        router.replace("/login");
+      }),
+    [router],
+  );
+
   async function signOut() {
     setSigningOut(true);
     setError("");
 
     try {
       await logoutUser();
+      setUser(null);
       router.replace("/login");
     } catch (reason) {
       setError(getApiErrorMessage(reason, "Unable to sign out."));

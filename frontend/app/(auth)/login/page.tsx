@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
-import { getApiErrorMessage, loginUser } from "../../../lib/api/client";
+import {
+  getApiErrorMessage,
+  getUserData,
+  loginUser,
+} from "../../../lib/api/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,6 +37,7 @@ export default function LoginPage() {
 
     try {
       await loginUser(form.email, form.password);
+      await getUserData();
       router.replace("/dashboard");
     } catch (cause) {
       setError(
